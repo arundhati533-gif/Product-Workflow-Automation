@@ -91,6 +91,18 @@ class StoriesOutput(BaseModel):
     stories: list[Story]
 
 
+class StoryReview(BaseModel):
+    story_id: str
+    clear_statement: bool
+    independent: bool
+    testable: bool
+    reasons: list[str] = Field(default_factory=list, description="One sentence per failed check.")
+
+
+class DorReviewOutput(BaseModel):
+    reviews: list[StoryReview]
+
+
 # --- Stage 4: Tasks ------------------------------------------------------------
 
 class Task(Item):

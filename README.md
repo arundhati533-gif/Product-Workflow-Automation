@@ -15,8 +15,8 @@ A local app that turns a stakeholder meeting transcript into a delivery-ready ba
 | Milestone | Status |
 |---|---|
 | M1 Foundation: parsers, schemas, storage, sample data, tests | Done |
-| M2 Pipeline: LLM client, stage prompts, DoR checker | Next |
-| M3 UI | |
+| M2 Pipeline: LLM client, stage prompts, DoR checker | Done |
+| M3 UI | Next |
 | M4 Excel export and demo mode | |
 | M5 Showcase README | |
 
@@ -26,7 +26,13 @@ A local app that turns a stakeholder meeting transcript into a delivery-ready ba
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # add your Anthropic API key
-pytest
+pytest                 # no API key needed; the model is faked in tests
+```
+
+Run all five stages on a sample transcript with the real Claude API (auto-approves each stage):
+
+```bash
+python scripts/run_sample.py --model claude-sonnet-5   # or claude-opus-5
 ```
 
 ## Sample data

@@ -209,6 +209,19 @@ class Storage:
             runs.append(run)
         return runs
 
+    def stage_runs_for_project(self, project_id: int, stage: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT r.* FROM stage_run r JOIN meeting m ON m.id = r.meeting_id"
+            " WHERE m.project_id = ? AND r.stage = ? ORDER BY r.id",
+            (project_id, stage),
+        )
+        runs = []
+        for r in rows:
+            run = dict(r)
+            run["output"] = json.loads(run.pop("output_json"))
+            runs.append(run)
+        return runs
+
     def set_stage_status(self, stage_run_id: int, status: str) -> None:
         with self._tx() as c:
             c.execute("UPDATE stage_run SET status = ? WHERE id = ?", (status, stage_run_id))

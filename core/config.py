@@ -7,10 +7,11 @@ DATA_DIR = ROOT / "data"
 DB_PATH = DATA_DIR / "app.db"
 SAMPLES_DIR = ROOT / "samples"
 
-# Selectable in Settings. Prices are USD per 1M tokens.
+# Selectable in Settings. Prices are USD per 1M tokens. `fallbacks` enables the
+# API's server-side fallback, which re-runs a declined request on another model.
 MODELS = {
-    "claude-opus-5": {"label": "Claude Opus 5 (best quality)", "input": 5.00, "output": 25.00},
-    "claude-sonnet-5": {"label": "Claude Sonnet 5 (lower cost)", "input": 2.00, "output": 10.00},
+    "claude-opus-5": {"label": "Claude Opus 5 (best quality)", "input": 5.00, "output": 25.00, "fallbacks": True},
+    "claude-sonnet-5": {"label": "Claude Sonnet 5 (lower cost)", "input": 2.00, "output": 10.00, "fallbacks": False},
 }
 DEFAULT_MODEL = "claude-opus-5"
 
