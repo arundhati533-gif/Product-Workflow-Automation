@@ -16,8 +16,8 @@ A local app that turns a stakeholder meeting transcript into a delivery-ready ba
 |---|---|
 | M1 Foundation: parsers, schemas, storage, sample data, tests | Done |
 | M2 Pipeline: LLM client, stage prompts, DoR checker | Done |
-| M3 UI | Next |
-| M4 Excel export and demo mode | |
+| M3 UI: settings, projects, meeting workspace | Done |
+| M4 Excel export and demo mode | Next |
 | M5 Showcase README | |
 
 ## Setup
@@ -28,6 +28,14 @@ pip install -r requirements.txt
 cp .env.example .env   # add your Anthropic API key
 pytest                 # no API key needed; the model is faked in tests
 ```
+
+Start the app:
+
+```bash
+streamlit run app/main.py
+```
+
+Then click **Load sample project**, open it, and add the sample kickoff transcript under **New meeting**.
 
 Run all five stages on a sample transcript with the real Claude API (auto-approves each stage):
 

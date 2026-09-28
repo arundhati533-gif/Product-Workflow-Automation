@@ -184,3 +184,36 @@ def test_tasks_missing_info_dropped_when_owner_present(env):
     missing = storage.latest_stage_run(mid, "tasks")["output"]["missing_info"]
     assert [(m["item_id"], m["field"]) for m in missing] == [("TASK-4", "dependency"), ("TASK-3", "owner")]
     assert any("unclear dependency on TASK-4" in f for f in p.dor_results(mid)["STORY-3"].failures)
+
+
+def test_edited_item_ids_track_user_changes_since_generation(env):
+    p, storage, _, _, mid = env
+    p.run_stage(mid, "extract")
+    assert p.edited_item_ids(mid, "extract") == set()
+    out = copy.deepcopy(storage.latest_stage_run(mid, "extract")["output"])
+    out["requirements"][1]["statement"] = "edited"
+    out["decisions"][0]["decided_by"] = "Mei Chen"
+    p.save_edit(mid, "extract", out)
+    assert p.edited_item_ids(mid, "extract") == {"REQ-2", "DEC-1"}
+    p.run_stage(mid, "extract")
+    assert p.edited_item_ids(mid, "extract") == set()
+
+
+def test_answer_dependency_questions(env):
+    p, storage, llm, _, mid = env
+    run_and_approve(p, mid, ["extract", "epics", "stories"])
+    tasks = copy.deepcopy(TASKS)
+    tasks["missing_info"] = [{"item_id": "NEW-4", "field": "dependency", "question": "SkyLane date?"}]
+    llm.overrides[TasksOutput] = tasks
+    p.run_stage(mid, "tasks")
+    p.answer_missing_info(mid, {"TASK-3": "Raj Patel"}, {"TASK-4": "SkyLane confirms by Feb 1"})
+    out = storage.latest_stage_run(mid, "tasks")["output"]
+    assert out["missing_info"] == []
+    assert out["tasks"][3]["description"].endswith("(Dependency: SkyLane confirms by Feb 1)")
+
+
+def test_month_cost(env):
+    p, storage, _, _, mid = env
+    p.run_stage(mid, "extract")
+    assert storage.month_cost() == pytest.approx(storage.meeting_cost(mid))
+    assert storage.month_cost("1999-01") == 0

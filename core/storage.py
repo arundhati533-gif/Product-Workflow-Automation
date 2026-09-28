@@ -226,6 +226,13 @@ class Storage:
         with self._tx() as c:
             c.execute("UPDATE stage_run SET status = ? WHERE id = ?", (status, stage_run_id))
 
+    def month_cost(self, month: str | None = None) -> float:
+        """Total spend for a calendar month ('YYYY-MM', default: current month)."""
+        month = month or datetime.now(timezone.utc).strftime("%Y-%m")
+        row = self.conn.execute(
+            "SELECT COALESCE(SUM(cost_usd), 0) FROM stage_run WHERE substr(created_at, 1, 7) = ?", (month,)).fetchone()
+        return float(row[0])
+
     def meeting_cost(self, meeting_id: int) -> float:
         row = self.conn.execute(
             "SELECT COALESCE(SUM(cost_usd), 0) FROM stage_run WHERE meeting_id = ?", (meeting_id,)).fetchone()

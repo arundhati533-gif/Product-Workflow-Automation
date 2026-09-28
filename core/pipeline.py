@@ -162,16 +162,44 @@ class Pipeline:
         self.storage.set_meeting_status(meeting_id, f"{stage}:draft")
         return self.storage.latest_stage_run(meeting_id, stage)
 
-    def answer_missing_info(self, meeting_id: int, owners: dict[str, str]) -> dict:
-        """Fill in task owners the model could not find (user journey J2, step 5)."""
+    def answer_missing_info(self, meeting_id: int, owners: dict[str, str],
+                            dependencies: dict[str, str] | None = None) -> dict:
+        """Apply answers to the questions the model could not answer (user journey J2, step 5).
+
+        `owners` sets task owners. `dependencies` records an answer to a dependency
+        question on the task's description and closes the question.
+        """
         run = self.storage.latest_stage_run(meeting_id, "tasks")
         if run is None:
             raise StageNotReady("Tasks have not been generated yet.")
         output = json.loads(json.dumps(run["output"]))
+        dependencies = {k: v.strip() for k, v in (dependencies or {}).items() if v.strip()}
         for task in output["tasks"]:
-            if task["id"] in owners and owners[task["id"]].strip():
+            if owners.get(task["id"], "").strip():
                 task["owner"] = owners[task["id"]].strip()
+            if task["id"] in dependencies:
+                task["description"] = f"{task['description']} (Dependency: {dependencies[task['id']]})"
+        output["missing_info"] = [
+            m for m in output["missing_info"]
+            if not (m["field"] == "dependency" and m["item_id"] in dependencies)
+        ]
         return self.save_edit(meeting_id, "tasks", output)
+
+    def edited_item_ids(self, meeting_id: int, stage: str) -> set[str]:
+        """Items the user changed since the model last generated this stage.
+
+        These are sent as locked on the next regenerate, so the model keeps them.
+        """
+        runs = self.storage.stage_runs(meeting_id, stage)
+        generated = next((r for r in reversed(runs) if r["model"]), None)
+        if not runs or generated is None or runs[-1]["id"] == generated["id"]:
+            return set()
+        latest = runs[-1]["output"]
+        edited = set()
+        for field_name, _ in STAGE_ITEMS[stage]:
+            before = {i["id"]: i for i in generated["output"].get(field_name, [])}
+            edited |= {i["id"] for i in latest.get(field_name, []) if before.get(i["id"]) != i}
+        return edited
 
     def approve(self, meeting_id: int, stage: str) -> dict:
         state = self.status(meeting_id)[stage]
