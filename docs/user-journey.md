@@ -1,6 +1,6 @@
 # User Journey — Meeting-to-Backlog Assistant
 
-Status: Draft for review · Based on [requirements.md](requirements.md)
+Status: Confirmed · Based on [requirements.md](requirements.md)
 
 **Persona:** A product manager on an integration team. They run several stakeholder meetings a week and turn each one into a Jira-ready backlog.
 
@@ -100,7 +100,7 @@ Each stage follows the same loop: **generate → review → edit or give feedbac
 
 | Situation | App behaviour |
 |---|---|
-| Transcript too long for one call | Warns you and processes it in sections, then merges the results |
+| Very long transcript | Warns you above a set size (a single meeting fits in one call) |
 | No requirements found | Says so and suggests checking the file or adding context |
 | API error or rate limit | Retries automatically, then shows a clear message; nothing already approved is lost |
 | Estimated cost above the cap | Asks you to confirm or switch to Sonnet 5 |
