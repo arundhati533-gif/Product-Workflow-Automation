@@ -25,6 +25,13 @@ def render() -> None:
             state.save_api_key(key)
             st.success("Key validated and saved.")
 
+    st.subheader("Demo mode")
+    demo = st.toggle("Replay recorded results instead of calling Claude", value=bool(settings["demo_mode"]),
+                     help="No API key or cost. Works with the sample transcripts only.")
+    if demo != bool(settings["demo_mode"]):
+        state.save_settings({**settings, "demo_mode": demo})
+        st.rerun()
+
     st.subheader("Defaults")
     with st.form("defaults"):
         models = list(config.MODELS)

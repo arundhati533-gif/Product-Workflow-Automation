@@ -1,0 +1,52 @@
+{
+  "epics": [
+    {
+      "id": "EPIC-1",
+      "title": "Card file ingestion",
+      "description": "Pick up, parse, validate and load the daily Meridian file before 6 a.m. Eastern, with a configurable layout and duplicate protection. Excludes matching.",
+      "requirement_ids": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-10"
+      ]
+    },
+    {
+      "id": "EPIC-2",
+      "title": "Card data security and audit",
+      "description": "Meet PCI obligations for card data and record every automatic action. Covers masking, raw file handling and audit trail.",
+      "requirement_ids": [
+        "REQ-5",
+        "REQ-13"
+      ]
+    },
+    {
+      "id": "EPIC-3",
+      "title": "Transaction-to-trip matching",
+      "description": "Match each card transaction to the right SkyLane trip and record the billed amount. Excludes what happens after the match.",
+      "requirement_ids": [
+        "REQ-6",
+        "REQ-11"
+      ]
+    },
+    {
+      "id": "EPIC-4",
+      "title": "Expense lines and unassigned queue",
+      "description": "Turn matched transactions into expense lines and give travellers a queue and reminders for the rest.",
+      "requirement_ids": [
+        "REQ-7",
+        "REQ-8",
+        "REQ-9"
+      ]
+    },
+    {
+      "id": "EPIC-5",
+      "title": "Operations visibility",
+      "description": "Show finance admins the daily health of the feed so they hear about problems before travellers do.",
+      "requirement_ids": [
+        "REQ-12"
+      ]
+    }
+  ]
+}

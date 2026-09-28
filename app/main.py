@@ -27,11 +27,17 @@ with st.sidebar:
         state.go("settings")
     st.divider()
     s = state.load_settings()
-    st.caption(f"Model: {s['model']}")
+    if s["demo_mode"]:
+        st.info("**Demo mode** — replaying recorded results for the sample transcripts. Turn it off in Settings.")
+    else:
+        st.caption(f"Model: {s['model']}")
     spent = state.storage().month_cost()
     cap = s["monthly_cost_cap"]
     st.caption(f"Spent this month: ${spent:.2f}" + (f" of ${cap:.2f}" if cap else ""))
-    if not state.api_key() and "llm" not in st.session_state:
-        st.warning("No API key yet. Add one in Settings.")
+    if not state.api_key() and not s["demo_mode"] and "llm" not in st.session_state:
+        st.warning("No API key yet. Add one in Settings, or try demo mode.")
+        if st.button("Try demo mode", width="stretch"):
+            state.save_settings({**s, "demo_mode": True})
+            st.rerun()
 
 VIEWS.get(state.current_view(), projects.render)()

@@ -10,12 +10,13 @@ import streamlit as st
 from dotenv import load_dotenv, set_key
 
 from core import config
+from core.demo import ReplayLLM
 from core.llm import ClaudeLLM
 from core.pipeline import Pipeline
 from core.storage import Storage
 
 ENV_PATH = config.ROOT / ".env"
-DEFAULT_SETTINGS = {"model": config.DEFAULT_MODEL, "monthly_cost_cap": 0.0}
+DEFAULT_SETTINGS = {"model": config.DEFAULT_MODEL, "monthly_cost_cap": 0.0, "demo_mode": False}
 
 load_dotenv(ENV_PATH)
 
@@ -62,9 +63,15 @@ def save_api_key(key: str) -> None:
 
 # --- LLM and pipeline ----------------------------------------------------------
 
+def demo_mode() -> bool:
+    return bool(load_settings()["demo_mode"])
+
+
 def llm():
-    if "llm" in st.session_state:  # tests and demo mode inject a replacement
+    if "llm" in st.session_state:  # tests inject a fake
         return st.session_state["llm"]
+    if demo_mode():
+        return ReplayLLM()
     if not api_key():
         return None
     return ClaudeLLM(load_settings()["model"], api_key=api_key())

@@ -18,24 +18,28 @@ PREFIXES = {
 }
 
 
-def assign_ids(items: Iterable[Item], prefix: str, taken: Iterable[str] = ()) -> dict[str, str]:
+def assign_ids(items: Iterable[Item], prefix: str, taken: Iterable[str] = (),
+               keep: Iterable[str] = ()) -> dict[str, str]:
     """Give every item without an ID the next free '<prefix>-<n>'.
 
     Valid existing IDs are kept. Missing, malformed or duplicate IDs are
-    replaced. IDs in `taken` (e.g. from earlier versions of this stage) are
-    never reused, so a deleted item's ID is not given to a new one.
+    replaced. IDs in `taken` (e.g. used by any meeting in the project) are not
+    given to new items, and an existing ID found in `taken` is replaced unless
+    it is also in `keep` (the IDs of the version being revised).
 
     Returns {old_id: new_id} for items whose non-empty ID was replaced (e.g.
     temporary "NEW-1" IDs), so references to them can be rewritten.
     """
     items = list(items)
     pattern = re.compile(rf"^{re.escape(prefix)}-(\d+)$")
-    used = {i.id for i in items if i.id} | set(taken)
+    taken, keep = set(taken), set(keep)
+    used = {i.id for i in items if i.id} | taken
     next_n = max((int(m[1]) for u in used if (m := pattern.match(u))), default=0) + 1
     seen: set[str] = set()
     renamed: dict[str, str] = {}
     for item in items:
-        if not item.id or not pattern.match(item.id) or item.id in seen:
+        clashes = item.id in taken and item.id not in keep
+        if not item.id or not pattern.match(item.id) or item.id in seen or clashes:
             new_id = f"{prefix}-{next_n}"
             next_n += 1
             if item.id and item.id not in seen:

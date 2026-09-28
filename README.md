@@ -17,8 +17,8 @@ A local app that turns a stakeholder meeting transcript into a delivery-ready ba
 | M1 Foundation: parsers, schemas, storage, sample data, tests | Done |
 | M2 Pipeline: LLM client, stage prompts, DoR checker | Done |
 | M3 UI: settings, projects, meeting workspace | Done |
-| M4 Excel export and demo mode | Next |
-| M5 Showcase README | |
+| M4 Excel export and demo mode | Done (demo uses placeholder data) |
+| M5 Showcase README | Next |
 
 ## Setup
 
@@ -36,6 +36,10 @@ streamlit run app/main.py
 ```
 
 Then click **Load sample project**, open it, and add the sample kickoff transcript under **New meeting**.
+
+No API key? Click **Try demo mode** in the sidebar. It replays recorded results for the sample kickoff transcript at no cost. The current recording is hand-written placeholder data; replace it with real output by running `python scripts/run_sample.py --record`.
+
+Every meeting exports to one Excel workbook (Summary, Requirements, Decisions, Epics, Stories, Tasks, RAID, Open Questions, Follow-up Email). Stories that fail the Definition of Ready are shaded, and missing owners show as TBD.
 
 Run all five stages on a sample transcript with the real Claude API (auto-approves each stage):
 

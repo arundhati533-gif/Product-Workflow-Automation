@@ -47,7 +47,9 @@ class LLMResult:
 
 
 def compute_cost(model: str, usage: Usage) -> float:
-    price = config.MODELS[model]
+    price = config.MODELS.get(model)
+    if price is None:  # demo mode
+        return 0.0
     per_input = price["input"] / 1_000_000
     per_output = price["output"] / 1_000_000
     return round(

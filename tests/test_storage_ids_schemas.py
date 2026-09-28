@@ -123,3 +123,10 @@ def test_storage_creates_file(tmp_path):
     s.create_project("P")
     s.close()
     assert (tmp_path / "sub" / "app.db").exists()
+
+
+def test_assign_ids_replaces_ids_used_elsewhere_unless_kept():
+    items = [_req("REQ-1"), _req("REQ-2")]
+    renamed = assign_ids(items, "REQ", taken=["REQ-1", "REQ-2"], keep=["REQ-2"])
+    assert [i.id for i in items] == ["REQ-3", "REQ-2"]
+    assert renamed == {"REQ-1": "REQ-3"}

@@ -217,3 +217,16 @@ def test_month_cost(env):
     p.run_stage(mid, "extract")
     assert storage.month_cost() == pytest.approx(storage.meeting_cost(mid))
     assert storage.month_cost("1999-01") == 0
+
+
+def test_temporary_ids_and_references_are_rewritten_in_any_stage(env):
+    p, storage, llm, _, mid = env
+    extract = copy.deepcopy(EXTRACT)
+    for i, r in enumerate(extract["requirements"]):
+        r["id"] = f"TMP-REQ-{i + 1}"
+    extract["open_questions"][0]["linked_ids"] = ["TMP-REQ-3"]
+    llm.overrides[ExtractOutput] = extract
+    p.run_stage(mid, "extract")
+    out = storage.latest_stage_run(mid, "extract")["output"]
+    assert [r["id"] for r in out["requirements"]] == ["REQ-1", "REQ-2", "REQ-3"]
+    assert out["open_questions"][0]["linked_ids"] == ["REQ-3"]

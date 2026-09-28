@@ -130,7 +130,7 @@ def test_settings_page_saves_defaults(app):
     next(b for b in at.button if b.label == "Save").click().run()
     assert not at.exception
     from app import state
-    assert state.load_settings() == {"model": "claude-sonnet-5", "monthly_cost_cap": 25.0}
+    assert state.load_settings() == {"model": "claude-sonnet-5", "monthly_cost_cap": 25.0, "demo_mode": False}
 
 
 def test_save_edits_round_trips_every_stage_editor(app):
@@ -156,3 +156,34 @@ def test_save_edits_round_trips_every_stage_editor(app):
 
 def pipeline_items(run):
     return {k: v for k, v in run["output"].items() if k != "dor_review"}
+
+
+def test_demo_mode_runs_without_api_key_and_offers_download(app, monkeypatch):
+    at, storage = app
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    del at.session_state["llm"]
+    from app import state
+    state.save_settings({**state.load_settings(), "demo_mode": True})
+    mid = _meeting(storage)
+    at.session_state["view"] = "meeting"
+    at.session_state["meeting_id"] = mid
+    at.run()
+    assert not at.exception
+    assert any("Demo mode" in i.value for i in at.info)
+    for stage in ["extract", "epics", "stories", "tasks", "raid_email"]:
+        _click(at, f"gen-{mid}-{stage}")
+        run = storage.latest_stage_run(mid, stage)
+        assert run["model"] == "demo"
+        _click(at, f"approve-{mid}-{stage}-{run['id']}")
+    assert storage.meeting_cost(mid) == 0
+    assert len(at.get("download_button")) >= 2
+
+
+def test_sidebar_offers_demo_mode_without_key(app, monkeypatch):
+    at, _ = app
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    del at.session_state["llm"]
+    at.run()
+    next(b for b in at.sidebar.button if b.label == "Try demo mode").click().run()
+    from app import state
+    assert state.demo_mode()

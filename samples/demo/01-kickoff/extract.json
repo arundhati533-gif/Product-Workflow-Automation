@@ -1,0 +1,173 @@
+{
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "statement": "Ingest the daily Meridian card transaction file (fixed-width, spec v3) from the partner SFTP drop.",
+      "type": "Functional",
+      "source_quote": "we deliver a daily transaction file over SFTP",
+      "speaker": "Tom Becker",
+      "timestamp": "01:11"
+    },
+    {
+      "id": "REQ-2",
+      "statement": "Finish loading the day's transactions by 6 a.m. Eastern; files land by 4 a.m. and peak at about 200,000 transactions.",
+      "type": "Non-functional",
+      "source_quote": "The whole thing needs to be done by six a.m. Eastern so travellers see transactions when they start their day.",
+      "speaker": "Raj Patel",
+      "timestamp": "02:25"
+    },
+    {
+      "id": "REQ-3",
+      "statement": "Validate the record count in each file against its trailer record.",
+      "type": "Functional",
+      "source_quote": "validate record counts against the trailer record",
+      "speaker": "Raj Patel",
+      "timestamp": "02:25"
+    },
+    {
+      "id": "REQ-4",
+      "statement": "Make the file layout configuration rather than code, so the Q1 move to spec v4 needs no rebuild.",
+      "type": "Non-functional",
+      "source_quote": "I'd design the parser so the layout is configuration, not code.",
+      "speaker": "Mei Chen",
+      "timestamp": "03:13"
+    },
+    {
+      "id": "REQ-5",
+      "statement": "Persist only the last four digits of the card number and delete the raw file after processing.",
+      "type": "Constraint",
+      "source_quote": "Only the last four digits can be persisted, and the raw file must be deleted after processing.",
+      "speaker": "Lena Park",
+      "timestamp": "03:41"
+    },
+    {
+      "id": "REQ-6",
+      "statement": "Match each transaction to a SkyLane trip by traveller, transaction date within the trip dates plus or minus two days, and optionally merchant category.",
+      "type": "Functional",
+      "source_quote": "I'd suggest a window of plus or minus two days around the trip to catch pre-trip bookings and late hotel charges.",
+      "speaker": "Mei Chen",
+      "timestamp": "04:49"
+    },
+    {
+      "id": "REQ-7",
+      "statement": "Automatically create an expense line on the traveller's open report for each matched transaction.",
+      "type": "Functional",
+      "source_quote": "For matched transactions, we automatically create an expense line on the traveller's open report for that trip.",
+      "speaker": "Priya Nair",
+      "timestamp": "06:41"
+    },
+    {
+      "id": "REQ-8",
+      "statement": "Place unmatched transactions in an unassigned queue that the traveller can see and assign manually.",
+      "type": "Functional",
+      "source_quote": "For unmatched transactions, they go into an unassigned queue that the traveller can see and assign manually.",
+      "speaker": "Priya Nair",
+      "timestamp": "06:41"
+    },
+    {
+      "id": "REQ-9",
+      "statement": "Remind the traveller when a transaction has been unassigned for three days.",
+      "type": "Functional",
+      "source_quote": "If something's been sitting unassigned for three days, send them a reminder.",
+      "speaker": "Aisha Rahman",
+      "timestamp": "07:11"
+    },
+    {
+      "id": "REQ-10",
+      "statement": "Detect duplicate transactions across resent files using reference number, amount and date.",
+      "type": "Functional",
+      "source_quote": "We can dedupe on that plus amount and date.",
+      "speaker": "Raj Patel",
+      "timestamp": "08:11"
+    },
+    {
+      "id": "REQ-11",
+      "statement": "Record expense lines in the traveller's home currency using the amount the bank billed.",
+      "type": "Functional",
+      "source_quote": "I want the amount the bank actually billed, not our own conversion.",
+      "speaker": "Aisha Rahman",
+      "timestamp": "08:26"
+    },
+    {
+      "id": "REQ-12",
+      "statement": "Give finance admins a view of whether today's file arrived, how many transactions loaded, how many failed validation, and the match rate.",
+      "type": "Functional",
+      "source_quote": "A simple admin view showing whether today's file arrived, how many transactions loaded, how many failed validation, and the match rate.",
+      "speaker": "Aisha Rahman",
+      "timestamp": "09:06"
+    },
+    {
+      "id": "REQ-13",
+      "statement": "Keep an audit trail for every system-generated expense line: marked as system-generated, with source file and time.",
+      "type": "Non-functional",
+      "source_quote": "every automatic action needs an audit trail.",
+      "speaker": "Lena Park",
+      "timestamp": "09:46"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC-1",
+      "statement": "Phase one uses the SFTP file drop, not the partner's real-time API.",
+      "decided_by": "Priya Nair",
+      "source_quote": "Phase one uses the SFTP file drop, not the API.",
+      "timestamp": "02:11"
+    },
+    {
+      "id": "DEC-2",
+      "statement": "Only the last four digits of the card number are persisted.",
+      "decided_by": "Priya Nair",
+      "source_quote": "we only persist the last four digits of the card number.",
+      "timestamp": "04:37"
+    },
+    {
+      "id": "DEC-3",
+      "statement": "The matching window is plus or minus two days around the trip.",
+      "decided_by": "Priya Nair",
+      "source_quote": "we'll go with a plus or minus two day matching window.",
+      "timestamp": "05:41"
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q-1",
+      "question": "Can we keep an encrypted copy of the raw file for a few days for reprocessing, and for how long?",
+      "raised_by": "Daniel Okafor",
+      "owner": "Lena Park",
+      "linked_ids": [
+        "REQ-5"
+      ],
+      "resolved": false
+    },
+    {
+      "id": "Q-2",
+      "question": "Does the SkyLane API return employee ID, or only email?",
+      "raised_by": "Mei Chen",
+      "owner": null,
+      "linked_ids": [
+        "REQ-6"
+      ],
+      "resolved": false
+    },
+    {
+      "id": "Q-3",
+      "question": "Do refunds create negative expense lines or offset the original line?",
+      "raised_by": "Carlos Ruiz",
+      "owner": "Aisha Rahman",
+      "linked_ids": [
+        "REQ-7"
+      ],
+      "resolved": false
+    },
+    {
+      "id": "Q-4",
+      "question": "Who owns notification service changes?",
+      "raised_by": "Daniel Okafor",
+      "owner": null,
+      "linked_ids": [
+        "REQ-9"
+      ],
+      "resolved": false
+    }
+  ]
+}

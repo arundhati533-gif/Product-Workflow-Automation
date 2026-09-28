@@ -9,6 +9,8 @@ import re
 
 import pandas as pd
 
+from core.formatting import email_to_text  # noqa: F401  (used by the UI)
+
 # Columns per item type, in display order. List fields are shown as comma-separated text.
 COLUMNS: dict[str, list[str]] = {
     "requirements": ["id", "statement", "type", "speaker", "timestamp", "source_quote"],
@@ -100,21 +102,3 @@ def text_to_ac(text: str) -> list[dict]:
         criteria.append({"given": m["given"].strip(), "when": m["when"].strip(),
                          "then": m["then"].strip(), "negative": bool(m["neg"])})
     return criteria
-
-
-# --- Follow-up email as plain text ----------------------------------------------------
-
-def email_to_text(email: dict) -> str:
-    lines = [f"Subject: {email['subject']}", "", "Hi all,", "", email["summary"], ""]
-    if email["decisions"]:
-        lines += ["Decisions", *[f"- {d}" for d in email["decisions"]], ""]
-    if email["action_items"]:
-        lines.append("Action items")
-        for a in email["action_items"]:
-            extra = ", ".join(x for x in [a.get("owner") or "Owner TBC", a.get("due_date") and f"due {a['due_date']}"] if x)
-            lines.append(f"- {a['action']} ({extra})")
-        lines.append("")
-    if email["open_questions"]:
-        lines += ["Open questions", *[f"- {q}" for q in email["open_questions"]], ""]
-    lines += ["Thanks,"]
-    return "\n".join(lines)

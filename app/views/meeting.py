@@ -9,7 +9,9 @@ from pydantic import ValidationError
 
 from app import state, tables
 from core import config
+from core.demo import ReplayLLM
 from core.dor import pass_rate
+from core.export import build_workbook, export_filename
 from core.llm import LLMError, estimate_meeting_cost
 from core.pipeline import STAGE_ITEMS, StageNotReady
 from core.schemas import Level, Priority, RaidItem, Requirement
@@ -33,8 +35,16 @@ def render() -> None:
 
     if st.button(f"← {project['name']}", type="tertiary"):
         state.go("project", project_id=project["id"])
-    st.title(meeting["title"])
-    st.caption(f"{meeting['date']} · cost so far ${db.meeting_cost(mid):.2f}")
+    title, download = st.columns([4, 1])
+    title.title(meeting["title"])
+    title.caption(f"{meeting['date']} · cost so far ${db.meeting_cost(mid):.2f}")
+    with download:
+        st.write("")
+        _download_button(pipe, meeting, key="dl-top")
+    if isinstance(pipe.llm, ReplayLLM):
+        placeholder = any(r.placeholder for r in pipe.llm.recordings)
+        st.info("Demo mode: results are replayed from a recording" + (" of placeholder data" if placeholder else "")
+                + ", so feedback doesn't change them. Everything else works as normal.")
     _show_flash()
 
     states = pipe.status(mid)
@@ -391,7 +401,8 @@ def _summary(pipe, mid: int) -> None:
     for stage in config.STAGES:
         out = pipe.approved_output(mid, stage)
         for field, _ in STAGE_ITEMS[stage]:
-            counts[field.replace("_", " ").capitalize()] = len(out[field]) if out else "—"
+            label = "RAID items" if field == "raid" else field.replace("_", " ").capitalize()
+            counts[label] = len(out[field]) if out else "—"
     cols = st.columns(4)
     for i, (label, n) in enumerate(counts.items()):
         cols[i % 4].metric(label, n)
@@ -403,7 +414,16 @@ def _summary(pipe, mid: int) -> None:
         st.success("All stages approved.")
     else:
         st.info("Some stages are not approved yet.")
-    st.caption("Excel export is added in the next milestone (M4).")
+    _download_button(pipe, db.get_meeting(mid), key="dl-summary", primary=True)
+    st.caption("Uses each stage's approved version, or its latest draft if not yet approved.")
+
+
+def _download_button(pipe, meeting: dict, key: str, primary: bool = False) -> None:
+    st.download_button(
+        "⬇ Download Excel", data=lambda: build_workbook(pipe, meeting["id"]),
+        file_name=export_filename(meeting), key=key, type="primary" if primary else "secondary",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
 
 # --- Flash messages survive st.rerun() ---------------------------------------------

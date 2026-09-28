@@ -99,7 +99,8 @@ backlog_item(id, project_id, meeting_id, type[epic|story|task|raid], item_key, d
 
 One workbook, built from the approved (or latest draft) output of each stage:
 
-- **Tabs:** Summary, Requirements, Epics, Stories, Tasks, RAID, Open Questions, Follow-up Email.
+- **Tabs:** Summary, Requirements, Decisions, Epics, Stories, Tasks, RAID, Open Questions, Follow-up Email.
+- **Summary counts are formulas** over the other tabs (e.g. `=COUNTA(Stories!A:A)-1`), so they stay correct if rows are edited in Excel.
 - **Formatting:** header row frozen and filterable; column widths set.
 - **Flags:** stories failing the DoR have a highlighted row and a "DoR failures" column.
 - **Links:** IDs match across tabs.
@@ -133,7 +134,7 @@ README.md                 # case study
 ## 9. Testing
 
 - **Unit tests:** parsers (a sample file of each format), DoR code checks, ID assignment, stale detection, Excel export, and the storage layer. The LLM is mocked, so tests are free and repeatable.
-- **Recorded fixtures:** real model output for the sample transcripts, saved as JSON. The app can replay these in a **demo mode** without an API key, which is useful for the GitHub showcase.
+- **Recorded fixtures:** model output for the sample transcripts, saved as JSON in `samples/demo/` (`scripts/run_sample.py --record`). The app replays these in **demo mode** without an API key, which is useful for the GitHub showcase. Recorded IDs are mapped by position onto the IDs in use, so replays link up correctly even when a project has other meetings.
 - **Quality check (after MVP):** a small evaluation set built from the sample transcripts, scored on requirements coverage and DoR pass rate.
 
 ## 10. Security

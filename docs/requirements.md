@@ -66,6 +66,7 @@ At each stage you can edit the output directly or give feedback, then regenerate
 |---|---|
 | Summary | Project, meeting, date, model, cost, counts |
 | Requirements | REQ-ID, statement, type, source speaker/timestamp, status |
+| Decisions | DEC-ID, decision, decided by, timestamp, source quote |
 | Epics | EPIC-ID, title, description, linked REQ-IDs |
 | Stories | STORY-ID, EPIC-ID, story statement, acceptance criteria, priority, points, status |
 | Tasks | TASK-ID, STORY-ID, description, owner, dependency IDs |

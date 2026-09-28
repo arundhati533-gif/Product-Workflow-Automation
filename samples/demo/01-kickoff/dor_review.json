@@ -1,0 +1,76 @@
+{
+  "reviews": [
+    {
+      "story_id": "STORY-1",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-2",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-3",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-4",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-5",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-6",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-7",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-8",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    },
+    {
+      "story_id": "STORY-9",
+      "clear_statement": true,
+      "independent": false,
+      "testable": true,
+      "reasons": [
+        "Reminder delivery depends on the notification service, whose owner is not confirmed (Q-4)."
+      ]
+    },
+    {
+      "story_id": "STORY-10",
+      "clear_statement": true,
+      "independent": true,
+      "testable": true,
+      "reasons": []
+    }
+  ]
+}

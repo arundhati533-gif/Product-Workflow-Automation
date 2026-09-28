@@ -331,10 +331,11 @@ class Pipeline:
                 item_cls = get_args(type(output).model_fields[field_name].annotation)[0]
                 items = _enforce_locks(items, current_output.get(field_name, []), locked_ids, item_cls)
                 setattr(output, field_name, items)
-            renamed |= assign_ids(items, prefix, taken=self._taken_ids(project_id, stage, field_name))
+            keep = {i.get("id") for i in (current_output or {}).get(field_name, [])}
+            renamed |= assign_ids(items, prefix, taken=self._taken_ids(project_id, stage, field_name), keep=keep)
 
+        _rewrite_refs(output, renamed)
         if stage == "tasks":
-            _rewrite_task_refs(output, renamed)
             _ensure_owner_questions(output)
         return output.model_dump()
 
@@ -399,13 +400,24 @@ def _enforce_locks(items: list, current_items: list[dict], locked_ids, item_cls:
     return out
 
 
-def _rewrite_task_refs(output: TasksOutput, renamed: dict[str, str]) -> None:
+REF_FIELDS = {"epic_id", "story_id", "item_id", "requirement_ids", "linked_ids", "dependency_ids"}
+
+
+def _rewrite_refs(output: BaseModel, renamed: dict[str, str]) -> None:
+    """Point references at renamed IDs (e.g. a task depending on temporary 'NEW-2')."""
     if not renamed:
         return
-    for task in output.tasks:
-        task.dependency_ids = [renamed.get(d, d) for d in task.dependency_ids]
-    for m in output.missing_info:
-        m.item_id = renamed.get(m.item_id, m.item_id)
+    for field_name in type(output).model_fields:
+        value = getattr(output, field_name)
+        for item in value if isinstance(value, list) else [value]:
+            if not isinstance(item, BaseModel):
+                continue
+            for ref in REF_FIELDS & set(type(item).model_fields):
+                current = getattr(item, ref)
+                if isinstance(current, list):
+                    setattr(item, ref, [renamed.get(v, v) for v in current])
+                elif current is not None:
+                    setattr(item, ref, renamed.get(current, current))
 
 
 def _ensure_owner_questions(output: TasksOutput) -> None:
