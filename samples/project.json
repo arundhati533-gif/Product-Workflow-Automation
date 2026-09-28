@@ -1,0 +1,22 @@
+{
+  "_note": "Fictional sample data. All companies, people and systems are invented.",
+  "name": "Voyant T&E — Corporate Card Feed Integration",
+  "description": "Voyant is a fictional travel & expense platform. This initiative integrates a daily corporate card transaction feed from Meridian Card Services and itinerary data from the SkyLane booking partner, so card transactions are auto-matched to trips and expense reports.",
+  "people": [
+    {"name": "Priya Nair", "role": "Product Manager", "team": "Voyant Integrations"},
+    {"name": "Daniel Okafor", "role": "Engineering Lead", "team": "Voyant Integrations"},
+    {"name": "Mei Chen", "role": "Solutions Architect", "team": "Voyant Platform"},
+    {"name": "Raj Patel", "role": "Data Engineer", "team": "Voyant Data"},
+    {"name": "Carlos Ruiz", "role": "QA Lead", "team": "Voyant Integrations"},
+    {"name": "Aisha Rahman", "role": "Finance Operations Manager", "team": "Client Finance (stakeholder)"},
+    {"name": "Lena Park", "role": "Compliance Analyst", "team": "Voyant Risk & Compliance"},
+    {"name": "Tom Becker", "role": "Partner Integration Manager", "team": "Meridian Card Services (partner)"}
+  ],
+  "systems": [
+    {"name": "Meridian Card Feed", "description": "Partner SFTP drop of daily card transaction files (fixed-width format)."},
+    {"name": "SkyLane Booking API", "description": "Partner REST API with trip and itinerary data."},
+    {"name": "Voyant Expense Service", "description": "Core service that stores expense lines and reports."},
+    {"name": "Voyant Matching Engine", "description": "Rules service that links transactions to trips and expense lines."},
+    {"name": "Voyant Notification Service", "description": "Sends email and in-app notifications to travellers."}
+  ]
+}

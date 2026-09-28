@@ -1,0 +1,130 @@
+WEBVTT
+
+00:00:04.000 --> 00:00:19.000
+<v Priya Nair>Okay, let's get started. Thanks everyone for joining. This is the kickoff for the Meridian card feed integration. The goal today is to agree on phase one scope, surface the big risks, and leave with owners for the next steps.</v>
+
+00:00:20.000 --> 00:00:41.000
+<v Priya Nair>Quick context. Today clients' travellers enter card expenses by hand. Aisha's team spends days every month chasing missing receipts and mismatched amounts. We want the card transactions to flow in automatically and get matched to the trip they belong to.</v>
+
+00:00:42.000 --> 00:01:10.000
+<v Aisha Rahman>Yes, and to be clear on the pain: at month end we have about fifteen percent of card spend with no expense line attached. My analysts reconcile that manually. If the feed can get that under five percent, that's a big win for us.</v>
+
+00:01:11.000 --> 00:01:35.000
+<v Tom Becker>From the Meridian side, we deliver a daily transaction file over SFTP. It's our fixed-width format, spec version three. Files land by four a.m. Eastern. For a client your size it's roughly two hundred thousand transactions a day at peak.</v>
+
+00:01:36.000 --> 00:01:52.000
+<v Daniel Okafor>Tom, is there an API option instead of the file drop? Pulling from an API would be easier for us to retry.</v>
+
+00:01:53.000 --> 00:02:10.000
+<v Tom Becker>There's a real-time API, but it's in beta and not contracted for your tier. I'd strongly recommend the file for phase one.</v>
+
+00:02:11.000 --> 00:02:24.000
+<v Priya Nair>Okay, let's decide that now. Phase one uses the SFTP file drop, not the API. We can revisit real-time in a later phase. Any objections? ... Good, that's decided.</v>
+
+00:02:25.000 --> 00:02:58.000
+<v Raj Patel>For ingestion, I'd need the full spec for version three. We need to parse the file, validate record counts against the trailer record, and load it into the expense service. The whole thing needs to be done by six a.m. Eastern so travellers see transactions when they start their day.</v>
+
+00:02:59.000 --> 00:03:12.000
+<v Tom Becker>I'll send the version three spec this week. One heads-up though: we're moving to spec version four sometime in Q1. It adds fields and changes the record layout.</v>
+
+00:03:13.000 --> 00:03:30.000
+<v Mei Chen>That's a risk for us. If we hard-code the v3 layout we'll have rework in Q1. I'd design the parser so the layout is configuration, not code. Tom, can you give us a v4 draft early?</v>
+
+00:03:31.000 --> 00:03:40.000
+<v Tom Becker>I can ask. I can't promise a date yet.</v>
+
+00:03:41.000 --> 00:04:05.000
+<v Lena Park>Before we go further, compliance requirement. The file contains full card numbers. We cannot store the full PAN anywhere in Voyant. Only the last four digits can be persisted, and the raw file must be deleted after processing. That's non-negotiable for PCI.</v>
+
+00:04:06.000 --> 00:04:20.000
+<v Daniel Okafor>Understood. So we mask on read, before anything is written to disk on our side. What's the retention on the raw file? Delete immediately after a successful load?</v>
+
+00:04:21.000 --> 00:04:36.000
+<v Lena Park>I need to confirm with our policy team whether we keep an encrypted copy for a few days for reprocessing. Let me take that as an open question.</v>
+
+00:04:37.000 --> 00:04:48.000
+<v Priya Nair>Decision for now then: we only persist the last four digits of the card number. Raw file retention is open, Lena to confirm.</v>
+
+00:04:49.000 --> 00:05:25.000
+<v Mei Chen>Now matching. The idea is to match each transaction to a SkyLane trip. We'd match on the traveller, the transaction date falling within the trip dates, and optionally the merchant category, like airline or hotel. I'd suggest a window of plus or minus two days around the trip to catch pre-trip bookings and late hotel charges.</v>
+
+00:05:26.000 --> 00:05:40.000
+<v Aisha Rahman>Two days sounds right. Hotels often post a day or two after checkout.</v>
+
+00:05:41.000 --> 00:05:50.000
+<v Priya Nair>Okay, we'll go with a plus or minus two day matching window. Decided.</v>
+
+00:05:51.000 --> 00:06:15.000
+<v Mei Chen>Big dependency here: how do we identify the traveller across both systems? The card feed has the cardholder's employee ID. I'm not sure the SkyLane API returns employee ID or just email.</v>
+
+00:06:16.000 --> 00:06:28.000
+<v Daniel Okafor>I don't know either. That's an open question for SkyLane. If it's only email we need a mapping table.</v>
+
+00:06:29.000 --> 00:06:40.000
+<v Priya Nair>I'll add that as an open question. Someone needs to reach out to SkyLane about it.</v>
+
+00:06:41.000 --> 00:07:10.000
+<v Priya Nair>Next, what happens after a match. For matched transactions, we automatically create an expense line on the traveller's open report for that trip. For unmatched transactions, they go into an unassigned queue that the traveller can see and assign manually.</v>
+
+00:07:11.000 --> 00:07:30.000
+<v Aisha Rahman>And travellers need a nudge. If something's been sitting unassigned for three days, send them a reminder. Otherwise it'll pile up until month end again.</v>
+
+00:07:31.000 --> 00:07:44.000
+<v Daniel Okafor>That would go through the notification service. I'm not sure who on our side owns notification changes right now.</v>
+
+00:07:45.000 --> 00:08:10.000
+<v Sam Ortiz>Hi, Sam from Aisha's finance team. One thing we see a lot: the same transaction shows up twice when the bank resends a file. We'd need duplicate detection so we don't create two expense lines for one charge.</v>
+
+00:08:11.000 --> 00:08:25.000
+<v Raj Patel>Good call. Meridian transactions have a unique reference number. We can dedupe on that plus amount and date.</v>
+
+00:08:26.000 --> 00:08:50.000
+<v Aisha Rahman>Also multi-currency. Travellers in London and Singapore get charged in local currency. We need the expense line in the traveller's home currency, and I want the amount the bank actually billed, not our own conversion.</v>
+
+00:08:51.000 --> 00:09:05.000
+<v Tom Becker>The file includes both the original amount and currency and the billed amount in the card's billing currency. So you can use the billed amount directly.</v>
+
+00:09:06.000 --> 00:09:30.000
+<v Aisha Rahman>My team also needs visibility. A simple admin view showing whether today's file arrived, how many transactions loaded, how many failed validation, and the match rate. Right now we find out about problems from angry travellers.</v>
+
+00:09:31.000 --> 00:09:45.000
+<v Priya Nair>Makes sense. An operations dashboard for finance admins. Let's keep it simple for phase one.</v>
+
+00:09:46.000 --> 00:10:05.000
+<v Lena Park>And every automatic action needs an audit trail. When the system creates an expense line from a card transaction, we need to record that it was system-generated, from which file, and when.</v>
+
+00:10:06.000 --> 00:10:30.000
+<v Carlos Ruiz>From QA, I'll need test files. Ideally Meridian gives us a sanitized sample file with edge cases: refunds, reversals, foreign currency, and a duplicate. Tom, is that possible?</v>
+
+00:10:31.000 --> 00:10:40.000
+<v Tom Becker>Yes, we have a certification test file. I'll include it with the spec.</v>
+
+00:10:41.000 --> 00:10:58.000
+<v Carlos Ruiz>Also, refunds. Do refunds create negative expense lines, or do they offset the original line? That changes the test cases a lot.</v>
+
+00:10:59.000 --> 00:11:10.000
+<v Aisha Rahman>Honestly, I need to check with our accounting policy. Let's leave that open.</v>
+
+00:11:11.000 --> 00:11:35.000
+<v Daniel Okafor>On risks: SkyLane has rate limits on their API. If we look up trips for two hundred thousand transactions every morning, we might hit them. We may need to cache trips or pull them in bulk overnight.</v>
+
+00:11:36.000 --> 00:11:50.000
+<v Mei Chen>I'll own the matching design, including how we get trip data without hitting the rate limits. I'll have a draft in two weeks.</v>
+
+00:11:51.000 --> 00:12:05.000
+<v Raj Patel>I'll take the file ingestion pipeline: parsing, validation, masking, and dedupe. I can start once I have the spec.</v>
+
+00:12:06.000 --> 00:12:25.000
+<v Aisha Rahman>Timeline-wise, our pilot client wants to go live with this at the start of their fiscal year, which is March first. That's firm on their side.</v>
+
+00:12:26.000 --> 00:12:40.000
+<v Daniel Okafor>March is tight if the v4 spec lands in Q1. We're assuming v3 stays supported through at least the end of March.</v>
+
+00:12:41.000 --> 00:12:52.000
+<v Tom Becker>v3 will be supported for at least six months after v4 launches. That's our standard policy.</v>
+
+00:12:53.000 --> 00:13:20.000
+<v Priya Nair>Great. Let me recap. Phase one: SFTP file ingestion with masking and dedupe, matching to SkyLane trips with a two-day window, auto-create expense lines for matches, an unassigned queue with a three-day reminder, billed-amount currency handling, an ops dashboard for finance admins, and a full audit trail.</v>
+
+00:13:21.000 --> 00:13:45.000
+<v Priya Nair>Open items: raw file retention with Lena, SkyLane traveller identifier, refund handling with Aisha, and the notification service owner. Tom sends the v3 spec and test file this week. Mei owns the matching design, Raj owns ingestion. I'll send a recap after this call. Thanks everyone.</v>

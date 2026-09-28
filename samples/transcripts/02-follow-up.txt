@@ -1,0 +1,101 @@
+Priya Nair   0:03
+Morning everyone. This is the two-week follow-up on the Meridian card feed. I want to close the open questions from kickoff and confirm whether anything in scope has changed.
+
+Priya Nair   0:15
+Let's start with open questions. Lena, raw file retention?
+
+Lena Park   0:21
+Policy team confirmed. We can keep an encrypted copy of the raw file for seven days for reprocessing, then it must be deleted automatically. The encryption key has to live in our key management service, not in the app config.
+
+Priya Nair   0:38
+Great, so seven-day encrypted retention with automatic deletion. That's decided.
+
+Mei Chen   0:45
+On the SkyLane traveller identifier: I spoke to their team. The API returns email only, no employee ID. So we need a mapping between the card feed's employee ID and the traveller's email.
+
+Daniel Okafor   1:02
+Where does that mapping come from? The client's HR feed?
+
+Aisha Rahman   1:08
+Our clients already upload an employee file to Voyant for user provisioning. It has employee ID and email. We can use that.
+
+Mei Chen   1:18
+Then that's a new requirement: build and maintain an employee ID to email mapping from the provisioning file, and flag transactions where the employee ID has no mapping. I'm a bit worried about data quality there. In the pilot client's file, I saw some employees with old email addresses.
+
+Priya Nair   1:36
+Let's log that as a risk. Mapping data quality could hurt the match rate.
+
+Aisha Rahman   1:44
+On refunds, accounting policy says a refund should offset the original expense line if we can find it. If we can't find the original, create a negative line in the unassigned queue.
+
+Carlos Ruiz   1:58
+That's clear, thanks. I'll update the test scenarios.
+
+Priya Nair   2:04
+And notifications. Daniel, did we find an owner?
+
+Daniel Okafor   2:09
+Yes, my team will own the notification changes. Carlos's team will test them.
+
+Priya Nair   2:15
+Now scope changes. Aisha, you mentioned something about currency?
+
+Aisha Rahman   2:20
+Yes. The pilot client turns out to be US-only for the first year. All their cards bill in US dollars. So multi-currency isn't needed for the pilot. I'd rather drop it from phase one and bring it back in phase two when the UK client onboards.
+
+Priya Nair   2:37
+Okay. Multi-currency handling moves out of phase one to phase two. Decided.
+
+Aisha Rahman   2:44
+Second change. After talking to travellers, three days is too aggressive for the unassigned reminder. People travel for a week and don't want reminders mid-trip. Let's make it five days after the transaction, and make the number configurable per client.
+
+Priya Nair   3:02
+Five days, configurable per client. Got it.
+
+Aisha Rahman   3:08
+Third, the ops dashboard. My team said they won't log in to another screen. What they really want is a daily summary email at seven a.m. with file status, loaded count, failures and match rate. Plus an alert email if the file hasn't arrived by five a.m.
+
+Daniel Okafor   3:25
+That's actually less work than a dashboard. So we replace the dashboard with a daily summary email and a missing-file alert?
+
+Aisha Rahman   3:31
+Yes. Replace it.
+
+Priya Nair   3:34
+Okay, the dashboard is replaced by the daily summary email plus a late-file alert. Decided.
+
+Mei Chen   3:42
+One addition from my side. SkyLane can send e-receipts for flights and hotels booked through them. If we attach those automatically to the matched expense line, travellers don't need to upload a receipt at all for those.
+
+Aisha Rahman   3:55
+That would be huge. Missing receipts are half of our month-end chasing.
+
+Daniel Okafor   4:01
+Is that in their API or a separate integration?
+
+Mei Chen   4:05
+Same API, separate endpoint. Rate limits apply, so it goes into my caching design.
+
+Priya Nair   4:12
+Let's add it to phase one as a should-have, not a must-have. If it threatens March first, it slips.
+
+Raj Patel   4:20
+Update on ingestion. Tom sent the v3 spec and the certification file. Parsing and masking are straightforward. One issue: the trailer record count doesn't include reversal records. That's not in the spec. I've asked Tom to confirm.
+
+Priya Nair   4:36
+Is Tom joining today?
+
+Raj Patel   4:39
+No, he's out this week. I'll follow up by email.
+
+Carlos Ruiz   4:44
+And the certification file has no duplicate transactions in it. I need one for testing dedupe. Raj, can you generate a synthetic duplicate?
+
+Raj Patel   4:52
+Sure, I'll add one.
+
+Daniel Okafor   4:56
+Timeline check: with multi-currency out and the dashboard simplified, March first looks realistic, as long as the mapping data isn't a mess.
+
+Priya Nair   5:05
+Good. Recap: open questions closed on retention, traveller identifier, refunds and notifications. New: employee mapping from the provisioning file, and SkyLane e-receipts as a should-have. Changed: reminder to five days and configurable. Replaced: dashboard with daily summary and late-file alert. Dropped from phase one: multi-currency. New risk: mapping data quality. Open: the trailer count for reversals, Raj following up with Tom. Thanks all.
