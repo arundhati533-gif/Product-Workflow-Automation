@@ -1,6 +1,6 @@
 # Requirements — Meeting-to-Backlog Assistant
 
-Status: Draft for confirmation · Owner: Product Manager (sole user)
+Status: Confirmed · Owner: Product Manager (sole user)
 
 ## 1. Problem
 
@@ -85,7 +85,23 @@ At each stage you can edit the output directly or give feedback, then regenerate
 - **Audience:** hiring managers for product manager roles.
 - **README as a case study:** problem, options considered, decisions, workflow, metrics, demo GIF, and a sample Excel output.
 
-## 10. Open items
+## 10. Definition of Ready (story quality check)
 
-- Definition of Ready checklist (for the quality metric).
-- Fictional domain and sample transcript for the demo.
+The app scores each story against this checklist. A story that fails is **flagged, not blocked**: it is still exported, highlighted, with the failed checks listed. The first-pass pass rate is the quality metric in §2.
+
+| # | Check | Rule |
+|---|---|---|
+| 1 | Clear statement | Follows "As a / I want / so that" with a named role and a stated benefit |
+| 2 | Independent | Can be delivered without another story in the same sprint, or the dependency is explicit |
+| 3 | Small | Estimate ≤ 8 points |
+| 4 | Testable | Every acceptance criterion is verifiable |
+| 5 | Acceptance criteria complete | At least 2 Given/When/Then criteria, including at least one negative or edge case |
+| 6 | Dependencies and owner named | Every dependency identified with an owner; no owner left as TBD |
+| 7 | No open questions | No unresolved open question linked to the story |
+
+## 11. Demo data
+
+- **Domain (fictional):** a travel and expense platform integrating a corporate card transaction feed and a travel booking partner. No real company, partner or system names.
+- **Sample transcripts:** Claude drafts two for review:
+  1. **Kickoff meeting:** initial requirements. Exercises F1–F4.
+  2. **Follow-up meeting:** adds, changes and drops scope. Exercises F5 (change detection).
