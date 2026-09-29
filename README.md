@@ -1,5 +1,7 @@
 # Meeting-to-Backlog
 
+[![Tests](https://github.com/arundhati533-gif/Product-Workflow-Automation/actions/workflows/tests.yml/badge.svg)](https://github.com/arundhati533-gif/Product-Workflow-Automation/actions/workflows/tests.yml)
+
 **Turn a stakeholder meeting transcript into a delivery-ready backlog (epics, stories with acceptance criteria, tasks with owners and dependencies), plus a RAID log and a follow-up email. You review and refine each stage, then export everything to Excel.**
 
 ![Stories with Definition of Ready checks](docs/screenshots/3-stories-dor.png)
