@@ -1,0 +1,225 @@
+{
+  "tasks": [
+    {
+      "id": "TASK-1",
+      "story_id": "STORY-1",
+      "description": "Define the configurable layout format for Meridian v3 records",
+      "owner": "Raj Patel",
+      "dependency_ids": [],
+      "system": "Meridian Card Feed"
+    },
+    {
+      "id": "TASK-2",
+      "story_id": "STORY-1",
+      "description": "Build the SFTP pickup job, scheduled after the 4 a.m. file drop",
+      "owner": "Raj Patel",
+      "dependency_ids": [],
+      "system": "Meridian Card Feed"
+    },
+    {
+      "id": "TASK-3",
+      "story_id": "STORY-1",
+      "description": "Implement the fixed-width parser driven by the layout configuration",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-1"
+      ],
+      "system": null
+    },
+    {
+      "id": "TASK-4",
+      "story_id": "STORY-1",
+      "description": "Load parsed transactions into the expense service",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-3"
+      ],
+      "system": "Voyant Expense Service"
+    },
+    {
+      "id": "TASK-5",
+      "story_id": "STORY-1",
+      "description": "Write test cases from the Meridian certification file",
+      "owner": "Carlos Ruiz",
+      "dependency_ids": [],
+      "system": null
+    },
+    {
+      "id": "TASK-6",
+      "story_id": "STORY-2",
+      "description": "Validate the trailer record count and reject mismatched files",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-3"
+      ],
+      "system": null
+    },
+    {
+      "id": "TASK-7",
+      "story_id": "STORY-3",
+      "description": "Implement duplicate detection on reference number, amount and date",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-4"
+      ],
+      "system": "Voyant Expense Service"
+    },
+    {
+      "id": "TASK-8",
+      "story_id": "STORY-4",
+      "description": "Mask card numbers to the last four digits on read and delete the raw file after load",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-3"
+      ],
+      "system": null
+    },
+    {
+      "id": "TASK-9",
+      "story_id": "STORY-4",
+      "description": "Compliance review of masking and raw file deletion",
+      "owner": "Lena Park",
+      "dependency_ids": [
+        "TASK-8"
+      ],
+      "system": null
+    },
+    {
+      "id": "TASK-10",
+      "story_id": "STORY-5",
+      "description": "Record audit fields on system-generated expense lines",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-4"
+      ],
+      "system": "Voyant Expense Service"
+    },
+    {
+      "id": "TASK-11",
+      "story_id": "STORY-6",
+      "description": "Design matching rules and the trip data caching approach",
+      "owner": "Mei Chen",
+      "dependency_ids": [],
+      "system": "Voyant Matching Engine"
+    },
+    {
+      "id": "TASK-12",
+      "story_id": "STORY-6",
+      "description": "Build a nightly bulk trip pull from SkyLane within its rate limits",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-11"
+      ],
+      "system": "SkyLane Booking API"
+    },
+    {
+      "id": "TASK-13",
+      "story_id": "STORY-6",
+      "description": "Implement matching on traveller, date window and merchant category",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-11",
+        "TASK-12"
+      ],
+      "system": "Voyant Matching Engine"
+    },
+    {
+      "id": "TASK-14",
+      "story_id": "STORY-7",
+      "description": "Map billed amount and billing currency fields from the file",
+      "owner": "Raj Patel",
+      "dependency_ids": [
+        "TASK-3"
+      ],
+      "system": "Meridian Card Feed"
+    },
+    {
+      "id": "TASK-15",
+      "story_id": "STORY-8",
+      "description": "Create expense lines on the open report for matched transactions",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-13"
+      ],
+      "system": "Voyant Expense Service"
+    },
+    {
+      "id": "TASK-16",
+      "story_id": "STORY-9",
+      "description": "Build the unassigned queue view for travellers",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-13"
+      ],
+      "system": null
+    },
+    {
+      "id": "TASK-17",
+      "story_id": "STORY-9",
+      "description": "Send a reminder for transactions unassigned for three days",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-16"
+      ],
+      "system": "Voyant Notification Service"
+    },
+    {
+      "id": "TASK-18",
+      "story_id": "STORY-10",
+      "description": "Build the operations view for finance admins",
+      "owner": null,
+      "dependency_ids": [
+        "TASK-4",
+        "TASK-13"
+      ],
+      "system": null
+    }
+  ],
+  "missing_info": [
+    {
+      "item_id": "TASK-2",
+      "field": "dependency",
+      "question": "Tom Becker will send the v3 spec and certification file 'this week'. What date should we plan against?"
+    },
+    {
+      "item_id": "TASK-13",
+      "field": "dependency",
+      "question": "Matching needs the SkyLane traveller identifier (Q-2). Who is contacting SkyLane, and by when?"
+    },
+    {
+      "item_id": "TASK-10",
+      "field": "owner",
+      "question": "Who owns 'Record audit fields on system-generated expense lines'?"
+    },
+    {
+      "item_id": "TASK-12",
+      "field": "owner",
+      "question": "Who owns 'Build a nightly bulk trip pull from SkyLane within its rate limits'?"
+    },
+    {
+      "item_id": "TASK-13",
+      "field": "owner",
+      "question": "Who owns 'Implement matching on traveller, date window and merchant category'?"
+    },
+    {
+      "item_id": "TASK-15",
+      "field": "owner",
+      "question": "Who owns 'Create expense lines on the open report for matched transactions'?"
+    },
+    {
+      "item_id": "TASK-16",
+      "field": "owner",
+      "question": "Who owns 'Build the unassigned queue view for travellers'?"
+    },
+    {
+      "item_id": "TASK-17",
+      "field": "owner",
+      "question": "Who owns 'Send a reminder for transactions unassigned for three days'?"
+    },
+    {
+      "item_id": "TASK-18",
+      "field": "owner",
+      "question": "Who owns 'Build the operations view for finance admins'?"
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+{
+  "stories": [
+    {
+      "id": "STORY-1",
+      "epic_id": "EPIC-1",
+      "as_a": "finance operations manager",
+      "i_want": "the daily Meridian file picked up from SFTP and parsed using a configurable v3 layout",
+      "so_that": "card spend reaches Voyant every morning without manual entry",
+      "acceptance_criteria": [
+        {
+          "given": "a valid v3 file lands on the SFTP drop by 4 a.m. Eastern",
+          "when": "the ingestion job runs",
+          "then": "all records are parsed and loaded by 6 a.m. Eastern",
+          "negative": false
+        },
+        {
+          "given": "the layout configuration is updated",
+          "when": "the next file is processed",
+          "then": "the parser uses the new layout without a code release",
+          "negative": false
+        },
+        {
+          "given": "a record does not match the configured layout",
+          "when": "the file is processed",
+          "then": "that record is rejected and logged, and the remaining records still load",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 8,
+      "requirement_ids": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-4"
+      ]
+    },
+    {
+      "id": "STORY-2",
+      "epic_id": "EPIC-1",
+      "as_a": "finance operations manager",
+      "i_want": "each file's record count checked against its trailer record",
+      "so_that": "we never load a partial or corrupted file",
+      "acceptance_criteria": [
+        {
+          "given": "a file whose record count matches the trailer",
+          "when": "it is validated",
+          "then": "the file is accepted for loading",
+          "negative": false
+        },
+        {
+          "given": "a file whose record count does not match the trailer",
+          "when": "it is validated",
+          "then": "the file is rejected, nothing is loaded, and an alert is raised",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 3,
+      "requirement_ids": [
+        "REQ-3"
+      ]
+    },
+    {
+      "id": "STORY-3",
+      "epic_id": "EPIC-1",
+      "as_a": "traveller",
+      "i_want": "a transaction resent in a later file to appear only once",
+      "so_that": "I don't have to delete duplicate expense lines",
+      "acceptance_criteria": [
+        {
+          "given": "a transaction with the same reference number, amount and date as one already loaded",
+          "when": "a new file is processed",
+          "then": "no second expense line is created",
+          "negative": false
+        },
+        {
+          "given": "a transaction with the same reference number but a different amount",
+          "when": "a new file is processed",
+          "then": "it is loaded and flagged for review",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 3,
+      "requirement_ids": [
+        "REQ-10"
+      ]
+    },
+    {
+      "id": "STORY-4",
+      "epic_id": "EPIC-2",
+      "as_a": "compliance analyst",
+      "i_want": "card numbers masked to the last four digits before anything is written, and raw files deleted after processing",
+      "so_that": "Voyant never stores a full card number",
+      "acceptance_criteria": [
+        {
+          "given": "a file containing full card numbers",
+          "when": "it is processed",
+          "then": "only the last four digits are stored",
+          "negative": false
+        },
+        {
+          "given": "processing has finished",
+          "when": "the database, logs and file storage are searched for full card numbers",
+          "then": "none are found",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 5,
+      "requirement_ids": [
+        "REQ-5"
+      ]
+    },
+    {
+      "id": "STORY-5",
+      "epic_id": "EPIC-2",
+      "as_a": "compliance analyst",
+      "i_want": "every system-generated expense line to record that it was system-generated, its source file and when",
+      "so_that": "auditors can trace any automatic action",
+      "acceptance_criteria": [
+        {
+          "given": "an expense line created from a card transaction",
+          "when": "an auditor opens it",
+          "then": "it shows 'system-generated', the source file name and the creation time",
+          "negative": false
+        }
+      ],
+      "priority": "Medium",
+      "points": 3,
+      "requirement_ids": [
+        "REQ-13"
+      ]
+    },
+    {
+      "id": "STORY-6",
+      "epic_id": "EPIC-3",
+      "as_a": "traveller",
+      "i_want": "each card transaction matched to my SkyLane trip when its date falls within the trip dates plus or minus two days",
+      "so_that": "my card spend lands on the right trip automatically",
+      "acceptance_criteria": [
+        {
+          "given": "a hotel charge dated one day after checkout",
+          "when": "matching runs",
+          "then": "it is matched to that trip",
+          "negative": false
+        },
+        {
+          "given": "a transaction dated five days after the trip ends",
+          "when": "matching runs",
+          "then": "it is not matched and goes to the unassigned queue",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 8,
+      "requirement_ids": [
+        "REQ-6"
+      ]
+    },
+    {
+      "id": "STORY-7",
+      "epic_id": "EPIC-3",
+      "as_a": "finance operations manager",
+      "i_want": "expense lines recorded at the amount the bank billed",
+      "so_that": "report totals match the card statement",
+      "acceptance_criteria": [
+        {
+          "given": "a transaction charged in GBP and billed in USD",
+          "when": "it is loaded",
+          "then": "the expense line shows the billed USD amount",
+          "negative": false
+        },
+        {
+          "given": "a transaction with no billed amount",
+          "when": "it is loaded",
+          "then": "it is flagged as a validation failure",
+          "negative": true
+        }
+      ],
+      "priority": "Medium",
+      "points": 2,
+      "requirement_ids": [
+        "REQ-11"
+      ]
+    },
+    {
+      "id": "STORY-8",
+      "epic_id": "EPIC-4",
+      "as_a": "traveller",
+      "i_want": "an expense line created automatically on my open report for each matched transaction",
+      "so_that": "I don't enter card expenses by hand",
+      "acceptance_criteria": [
+        {
+          "given": "a matched transaction and an open report for that trip",
+          "when": "matching completes",
+          "then": "an expense line is added to that report",
+          "negative": false
+        },
+        {
+          "given": "a matched transaction and no open report for that trip",
+          "when": "matching completes",
+          "then": "the transaction goes to the unassigned queue",
+          "negative": true
+        }
+      ],
+      "priority": "High",
+      "points": 5,
+      "requirement_ids": [
+        "REQ-7"
+      ]
+    },
+    {
+      "id": "STORY-9",
+      "epic_id": "EPIC-4",
+      "as_a": "traveller",
+      "i_want": "to see unmatched transactions in a queue, assign them myself, and get a reminder after three days",
+      "so_that": "nothing piles up until month end",
+      "acceptance_criteria": [
+        {
+          "given": "an unmatched transaction",
+          "when": "I open my expenses",
+          "then": "it appears in my unassigned queue and I can assign it to a report",
+          "negative": false
+        },
+        {
+          "given": "a transaction unassigned for three days",
+          "when": "the daily reminder job runs",
+          "then": "I receive a reminder",
+          "negative": false
+        },
+        {
+          "given": "a transaction I assigned within three days",
+          "when": "the reminder job runs",
+          "then": "no reminder is sent",
+          "negative": true
+        }
+      ],
+      "priority": "Medium",
+      "points": 5,
+      "requirement_ids": [
+        "REQ-8",
+        "REQ-9"
+      ]
+    },
+    {
+      "id": "STORY-10",
+      "epic_id": "EPIC-5",
+      "as_a": "finance admin",
+      "i_want": "a view of today's file status, loaded count, validation failures and match rate",
+      "so_that": "we spot feed problems before travellers do",
+      "acceptance_criteria": [
+        {
+          "given": "today's file has been processed",
+          "when": "I open the operations view",
+          "then": "I see arrival time, loaded count, failures and match rate",
+          "negative": false
+        },
+        {
+          "given": "today's file has not arrived",
+          "when": "I open the operations view",
+          "then": "it shows 'not received'",
+          "negative": true
+        }
+      ],
+      "priority": "Medium",
+      "points": 5,
+      "requirement_ids": [
+        "REQ-12"
+      ]
+    }
+  ]
+}

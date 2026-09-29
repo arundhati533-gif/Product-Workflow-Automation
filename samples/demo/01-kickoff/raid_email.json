@@ -1,0 +1,130 @@
+{
+  "raid": [
+    {
+      "id": "RAID-1",
+      "type": "Risk",
+      "description": "Meridian moves to spec v4 in Q1 with a changed record layout, which could cause rework.",
+      "owner": "Mei Chen",
+      "status": "Open",
+      "impact": "Medium",
+      "likelihood": "High",
+      "mitigation": "Make the layout configuration (STORY-1) and ask Tom Becker for an early v4 draft.",
+      "due_date": null,
+      "linked_ids": [
+        "EPIC-1"
+      ]
+    },
+    {
+      "id": "RAID-2",
+      "type": "Risk",
+      "description": "SkyLane API rate limits may be hit when looking up trips for about 200,000 transactions each morning.",
+      "owner": "Mei Chen",
+      "status": "Open",
+      "impact": "High",
+      "likelihood": "Medium",
+      "mitigation": "Pull trips in bulk overnight and cache them; covered in the matching design.",
+      "due_date": "2026-01-26",
+      "linked_ids": [
+        "EPIC-3",
+        "STORY-6"
+      ]
+    },
+    {
+      "id": "RAID-3",
+      "type": "Dependency",
+      "description": "Meridian v3 spec and certification test file from Tom Becker.",
+      "owner": "Tom Becker",
+      "status": "Open",
+      "impact": "High",
+      "likelihood": null,
+      "mitigation": "Tom to send this week; Raj to confirm receipt.",
+      "due_date": "2026-01-16",
+      "linked_ids": [
+        "EPIC-1"
+      ]
+    },
+    {
+      "id": "RAID-4",
+      "type": "Assumption",
+      "description": "Spec v3 stays supported for at least six months after v4 launches.",
+      "owner": "Tom Becker",
+      "status": "Open",
+      "impact": "Medium",
+      "likelihood": null,
+      "mitigation": "Confirm in writing with Meridian.",
+      "due_date": null,
+      "linked_ids": [
+        "EPIC-1"
+      ]
+    },
+    {
+      "id": "RAID-5",
+      "type": "Issue",
+      "description": "No confirmed owner for notification service changes needed for reminders.",
+      "owner": "Daniel Okafor",
+      "status": "Open",
+      "impact": "Medium",
+      "likelihood": null,
+      "mitigation": "Daniel to name an owner before sprint planning.",
+      "due_date": null,
+      "linked_ids": [
+        "STORY-9"
+      ]
+    },
+    {
+      "id": "RAID-6",
+      "type": "Risk",
+      "description": "Pilot client go-live on March 1 is fixed; open questions on SkyLane identifiers and refunds could delay matching and expense creation.",
+      "owner": "Priya Nair",
+      "status": "Open",
+      "impact": "High",
+      "likelihood": "Medium",
+      "mitigation": "Close Q-2 and Q-3 within two weeks; track weekly against the March 1 date.",
+      "due_date": "2026-01-26",
+      "linked_ids": [
+        "EPIC-3",
+        "EPIC-4"
+      ]
+    }
+  ],
+  "email": {
+    "subject": "Recap: Meridian card feed kickoff (12 Jan)",
+    "summary": "Thanks all. We agreed phase one scope for the Meridian card feed: daily SFTP ingestion with masking and duplicate checks, matching to SkyLane trips, automatic expense lines with an unassigned queue, billed-amount handling, an operations view and a full audit trail. The pilot client goes live on March 1.",
+    "decisions": [
+      "Phase one uses the SFTP file drop, not the real-time API.",
+      "Only the last four digits of the card number are stored.",
+      "The matching window is plus or minus two days around the trip."
+    ],
+    "action_items": [
+      {
+        "action": "Send the v3 spec and certification test file",
+        "owner": "Tom Becker",
+        "due_date": "2026-01-16"
+      },
+      {
+        "action": "Draft the matching design, including trip caching",
+        "owner": "Mei Chen",
+        "due_date": "2026-01-26"
+      },
+      {
+        "action": "Start the ingestion pipeline once the spec arrives",
+        "owner": "Raj Patel",
+        "due_date": null
+      },
+      {
+        "action": "Confirm raw file retention policy",
+        "owner": "Lena Park",
+        "due_date": null
+      },
+      {
+        "action": "Confirm refund handling with accounting",
+        "owner": "Aisha Rahman",
+        "due_date": null
+      }
+    ],
+    "open_questions": [
+      "Does the SkyLane API return employee ID or only email? (owner to be confirmed)",
+      "Who owns notification service changes? (Daniel to confirm)"
+    ]
+  }
+}
